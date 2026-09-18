@@ -1,19 +1,23 @@
 #include <iostream>
 #include <cstring>
 #include <new>
-
-struct Arena { 
-    char maxMemory[300];
-    char* current = maxMemory;
-};
+#include <Allocator.h>
 
 struct Chunk {
     size_t size;
-    Chunk* next;
     bool free;
 };
 
-Arena data;
+class Arena {
+private:
+    char maxMemory[300];
+    char* current;
+
+public:
+    Arena();
+};
+
+
 
 char* my_malloc(size_t size) { 
     if (data.current + sizeof(Chunk) + size <= data.maxMemory + sizeof(data.maxMemory)) {        
@@ -21,6 +25,7 @@ char* my_malloc(size_t size) {
         dataChunk->size = size;
         char* dataPtr = reinterpret_cast<char*>(dataChunk + 1);
         data.current += sizeof(Chunk) + size;    
+        dataChunk->free = false;
 
         return dataPtr;
 
@@ -64,11 +69,34 @@ int parsePtr(const char* str) {
     return result;
 }
 
-char* my_free(char* str) {
-    return 0;
+void my_free(char* ptr)
+{
+    if (ptr == nullptr)
+        return;
+
+    Chunk* chunk = reinterpret_cast<Chunk*>(ptr) - 1;
+
+    char* begin = reinterpret_cast<char*>(chunk + 1);
+    char* end = begin + chunk->size;
+
+    while (begin < end) {
+        *begin = 0;
+        ++begin;
+    }
+
+    chunk->free = true;
 }
 
-int main(int argc, char** argv) {   
-    std::cout << my_malloc(parsePtr(argv[1])) << std::endl;
+#include "Allocator.h"
+#include <iostream>
+
+int main()
+{
+    Allocator allocator;
+
+    char* ptr = allocator.malloc(50);
+
+    allocator.free(ptr);
+
     return 0;
 }
