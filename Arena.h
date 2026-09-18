@@ -8,6 +8,9 @@ private:
 
 public:
     Arena();
+
+    bool hasSpace(size_t size) const;
+    char* allocate (size_t size);
     ~Arena();
 };
 

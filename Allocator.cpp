@@ -11,7 +11,7 @@ Allocator::~Allocator()
 
 char* Allocator::malloc(size_t size)
 {
-    // TODO
+    if (arena)
     return nullptr;
 }
 
