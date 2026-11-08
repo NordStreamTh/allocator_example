@@ -1,2 +1,2 @@
 # allocator_example
-just kidding with C++
+Example of primitive allocator implemented in C++
